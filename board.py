@@ -22,12 +22,21 @@ class Board:
         self.en_passant = -1
         self.halfmove = 0
         self.fullmove = 1
+        self.king_sq = {WHITE: -1, BLACK: -1}
 
     def piece_at(self, square):
         return self.squares[square]
 
     def set_piece(self, square, piece):
+        current_piece = self.piece_at(square)
+
+        if abs(current_piece) == KING:
+            self.king_sq[WHITE if current_piece > 0 else BLACK] = -1
+            
         self.squares[square] = piece
+        
+        if abs(piece) == KING:
+            self.king_sq[WHITE if piece > 0 else BLACK] = square
 
     def make_move(self, move):
         undo = {
