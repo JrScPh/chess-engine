@@ -1,20 +1,20 @@
 from constants import (
     EMPTY, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING,
     WHITE, BLACK,
+    CASTLE_WK, CASTLE_WQ, CASTLE_BK, CASTLE_BQ,
     CASTLE_KING, CASTLE_QUEEN,
     EN_PASSANT, DOUBLE_PUSH,
     QUIET, CAPTURE,
     PROMO_Q, PROMO_R, PROMO_B, PROMO_N,
-    CASTLE_WK, CASTLE_WQ, CASTLE_BK, CASTLE_BQ,
     sq, rank_of, file_of,
 )
 from board import Board
 from move import Move
 
-DIAGONAL_DELTAS  = [[1,1],[1,-1],[-1,1],[-1,-1]]
-RANK_FILE_DELTAS = [[1,0],[-1,0],[0,1],[0,-1]]
-KNIGHT_DELTAS    = [[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[-1,2],[1,-2],[-1,-2]]
-ALL_DELTAS = DIAGONAL_DELTAS + RANK_FILE_DELTAS
+DIAGONAL_DELTAS  = [[-1,-1],[-1,1],[1,-1],[1,1]]
+RANK_FILE_DELTAS = [[-1,0],[1,0],[0,-1],[0,1]]
+KNIGHT_DELTAS    = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]
+ALL_DELTAS       = DIAGONAL_DELTAS + RANK_FILE_DELTAS
 
 class MoveGenerator:
 
@@ -102,7 +102,95 @@ class MoveGenerator:
 
     def is_in_check(self, board, side):
         return self.is_square_attacked(board, board.king_sq[side], side)
-    
+
+    def pawn_moves(self, board, square):
+        moves = []
+        r, f = rank_of(square), file_of(square)
+        promo_rank = 7 if board.side == WHITE else 0
+        start_rank = 1 if board.side == WHITE else 6
+        promos = [PROMO_Q, PROMO_R, PROMO_B, PROMO_N]
+
+        to_sq = sq(f, r + board.side)
+        if 0 <= r + board.side < 8 and board.piece_at(to_sq) == EMPTY:
+            if r + board.side == promo_rank:
+                for promo in promos:
+                    moves.append(Move(square, to_sq, promo))
+            else:
+                moves.append(Move(square, to_sq))
+
+                if r == start_rank:
+                    to_sq2 = sq(f, r + board.side * 2)
+                    if board.piece_at(to_sq2) == EMPTY:
+                        moves.append(Move(square, to_sq2, DOUBLE_PUSH))
+
+        for df in [-1, 1]:
+            cap_f = f + df
+            cap_r = r + board.side
+
+            if 0 <= cap_r < 8 and 0 <= cap_f < 8:
+                to_sq = sq(cap_f, cap_r)
+                target = board.piece_at(to_sq)
+
+                if target != EMPTY and (target > 0) != (board.side == WHITE):
+                    if cap_r == promo_rank:
+                        for promo in promos:
+                            moves.append(Move(square, to_sq, promo, target))
+                    else:
+                        moves.append(Move(square, to_sq, CAPTURE, target))
+                elif to_sq == board.en_passant:
+                    moves.append(Move(square, to_sq, EN_PASSANT))
+
+        return moves
+
+    def knight_moves(self, board, square):
+        moves = []
+        r, f = rank_of(square), file_of(square)
+
+        for dr, df in KNIGHT_DELTAS:
+            cur_r, cur_f = r + dr, f + df
+
+            if 0 <= cur_r < 8 and 0 <= cur_f < 8:
+                to_sq = sq(cur_f, cur_r)
+                target = board.piece_at(to_sq)
+
+                if target == EMPTY:
+                    moves.append(Move(square, to_sq))
+                elif (target > 0) != (board.side == WHITE):
+                    moves.append(Move(square, to_sq, CAPTURE, target))
+
+        return moves
+
+    def sliding_moves(self, board, square, deltas):
+        moves = []
+
+        for dr, df in deltas:
+            r, f = rank_of(square), file_of(square)
+
+            while 0 <= r + dr < 8 and 0 <= f + df < 8:
+                r += dr
+                f += df
+                to_sq = sq(f, r)
+                target = board.piece_at(to_sq)
+
+                if target == EMPTY:
+                    moves.append(Move(square, to_sq))
+                elif (target > 0) != (board.side == WHITE):
+                    moves.append(Move(square, to_sq, CAPTURE, target))
+                    break
+                else:
+                    break
+
+        return moves
+
+    def bishop_moves(self, board, square):
+        return self.sliding_moves(board, square, DIAGONAL_DELTAS)
+
+    def rook_moves(self, board, square):
+        return self.sliding_moves(board, square, RANK_FILE_DELTAS)
+
+    def queen_moves(self, board, square):
+        return self.sliding_moves(board, square, ALL_DELTAS)
+
     def king_moves(self, board, square):
         moves = []
         r, f = rank_of(square), file_of(square)
