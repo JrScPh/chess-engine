@@ -1,8 +1,8 @@
 import sys
 import time
 import argparse
-from fen import board_from_fen, STARTING_FEN
-from move_generator import MoveGenerator, perft
+from engine.fen import board_from_fen
+from engine.move_generator import MoveGenerator, perft
 
 KIWIPETE_FEN = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
 

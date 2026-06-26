@@ -1,9 +1,9 @@
-import pytest
-from fen import board_from_fen
-from move_generator import MoveGenerator
-from constants import *
-from game import Game
-from move import Move
+import pytest  # type: ignore[import]
+from engine.fen import board_from_fen
+from engine.move_generator import MoveGenerator
+from engine.constants import *
+from engine.game import Game
+from engine.move import Move
 
 gen = MoveGenerator()
 

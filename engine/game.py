@@ -1,13 +1,13 @@
-from constants import (
+from engine.constants import (
     EMPTY, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING,
     WHITE, BLACK,
     GameStatus,
     file_of, rank_of,
 )
-from board import Board
-from fen import board_from_fen, board_to_fen, STARTING_FEN
-from move_generator import MoveGenerator
-from move import Move
+from engine.board import Board
+from engine.fen import board_from_fen, board_to_fen, STARTING_FEN
+from engine.move_generator import MoveGenerator
+from engine.move import Move
 
 
 class Game:

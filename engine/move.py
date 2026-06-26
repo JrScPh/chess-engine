@@ -1,4 +1,4 @@
-from constants import EMPTY, QUIET, PROMO_Q, PROMO_R, PROMO_B, PROMO_N, CASTLE_KING, CASTLE_QUEEN, EN_PASSANT
+from engine.constants import EMPTY, QUIET, PROMO_Q, PROMO_R, PROMO_B, PROMO_N, CASTLE_KING, CASTLE_QUEEN, EN_PASSANT
 
 class Move:
     def __init__(self, from_sq, to_sq, flag=QUIET, captured=EMPTY):

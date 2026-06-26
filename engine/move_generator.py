@@ -1,4 +1,4 @@
-from constants import (
+from engine.constants import (
     EMPTY, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING,
     WHITE, BLACK,
     CASTLE_WK, CASTLE_WQ, CASTLE_BK, CASTLE_BQ,
@@ -8,8 +8,8 @@ from constants import (
     PROMO_Q, PROMO_R, PROMO_B, PROMO_N,
     sq, rank_of, file_of,
 )
-from board import Board
-from move import Move
+from engine.board import Board
+from engine.move import Move
 
 DIAGONAL_DELTAS  = [[-1,-1],[-1,1],[1,-1],[1,1]]
 RANK_FILE_DELTAS = [[-1,0],[1,0],[0,-1],[0,1]]

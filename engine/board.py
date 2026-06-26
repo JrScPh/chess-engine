@@ -1,4 +1,4 @@
-from constants import (
+from engine.constants import (
     EMPTY, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING,
     WHITE, BLACK,
     CASTLE_WK, CASTLE_WQ, CASTLE_BK, CASTLE_BQ,
