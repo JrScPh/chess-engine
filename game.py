@@ -30,10 +30,12 @@ class Game:
         self.current_status = self.status()
 
     def pop(self):
-        move, undo = self.history.pop()
-        self.board.unmake_move(move, undo)
         pos = self._position_key()
         self.position_counts[pos] = self.position_counts.get(pos, 0) - 1
+        if self.position_counts[pos] < 1:
+            del self.position_counts[pos]
+        move, undo = self.history.pop()
+        self.board.unmake_move(move, undo)
         self.current_status = self.status()
 
     def status(self):
@@ -44,7 +46,7 @@ class Game:
                 return GameStatus.CHECKMATE
             return GameStatus.STALEMATE
 
-        if self.board.halfmove >= 50:
+        if self.board.halfmove >= 100:
             return GameStatus.DRAW_FIFTY_MOVE
 
         if self._is_insufficient_material():

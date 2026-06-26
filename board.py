@@ -49,7 +49,7 @@ class Board:
         piece_type = abs(piece)
 
         if move.is_en_passant:
-            self.set_piece(move.to_sq + 8 * self.side, EMPTY)
+            self.set_piece(move.to_sq - 8 * self.side, EMPTY)
 
         elif move.flag == CASTLE_KING:
             self.set_piece(move.to_sq - 1, self.piece_at(move.to_sq + 1))
@@ -75,8 +75,9 @@ class Board:
 
         if move.is_promotion:
             piece = PROMO_MAP[move.flag] * self.side
-        self.set_piece(move.to_sq, piece)
         self.set_piece(move.from_sq, EMPTY)
+        self.set_piece(move.to_sq, piece)
+        
 
         if move.is_capture or piece_type == PAWN:
             self.halfmove = 0
@@ -104,11 +105,9 @@ class Board:
         else:
             piece = self.piece_at(move.to_sq)
 
-        self.set_piece(move.from_sq, piece)
-
         if move.is_en_passant:
             self.set_piece(move.to_sq, EMPTY)
-            self.set_piece(move.to_sq + 8 * self.side, PAWN * -self.side)
+            self.set_piece(move.to_sq - 8 * self.side, PAWN * -self.side)
         elif move.flag == CASTLE_KING:
             self.set_piece(move.to_sq, EMPTY)
             self.set_piece(move.to_sq + 1, ROOK * self.side)
@@ -121,3 +120,5 @@ class Board:
             self.set_piece(move.to_sq, move.captured)
         else:
             self.set_piece(move.to_sq, EMPTY)
+            
+        self.set_piece(move.from_sq, piece)

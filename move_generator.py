@@ -16,6 +16,21 @@ RANK_FILE_DELTAS = [[-1,0],[1,0],[0,-1],[0,1]]
 KNIGHT_DELTAS    = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]
 ALL_DELTAS       = DIAGONAL_DELTAS + RANK_FILE_DELTAS
 
+def perft(board, gen, depth):
+    if depth == 0:
+        return 1
+
+    nodes = 0
+    moves = gen.generate_pseudo_legal_moves(board)
+
+    for move in moves:
+        undo = board.make_move(move)
+        if not gen.is_in_check(board, -board.side):
+            nodes += perft(board, gen, depth - 1)
+        board.unmake_move(move, undo)
+
+    return nodes
+
 class MoveGenerator:
 
     def generate_moves(self, board):
