@@ -12,8 +12,19 @@
 </head>
 
 <body>
+    <header>
+    <h1 id="status-title"></h1>
+    <p id="status-subtitle"></p>
+    </header>
     <div id="board"></div>
+        <div id="promotion-dialog" class="hidden">
+        <button id="promo-queen">♕</button>
+        <button id="promo-rook">♖</button>
+        <button id="promo-bishop">♗</button>
+        <button id="promo-knight">♘</button>
+    </div>
     <script src="{% static 'board.js' %}"></script>
+
 </body>
 
 </html>

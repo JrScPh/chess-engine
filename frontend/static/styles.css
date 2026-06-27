@@ -1,9 +1,14 @@
 body {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
+}
+
+header {
+    text-align: center;
 }
 
 #board {
@@ -27,4 +32,28 @@ body {
     justify-content: center;
     align-items: center;
     font-size: 6vmin;
+}
+
+.square.highlighted {
+    background-color: rgba(255, 255, 0, 0.4);
+}
+
+.hidden {
+    display: none;
+}
+
+#promotion-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 1em;
+    border-radius: 8px;
+    gap: 0.5em;
+}
+
+#promotion-dialog button {
+    font-size: 4vmin;
+    cursor: pointer;
 }

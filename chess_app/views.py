@@ -1,13 +1,15 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.views.decorators.csrf import ensure_csrf_cookie
 from engine.game import Game
 from engine.move import Move
+from engine.constants import EMPTY
 import json
 
 def move_from_dict(move):
     return Move(move['from_sq'], move['to_sq'], move['flag'], move['captured'])
 
+@ensure_csrf_cookie
 def index(request):
     return render(request, 'index.html')
 
@@ -19,6 +21,7 @@ def start_game(request):
         'board' : game.board.squares,
         'legal_moves' : [{'from_sq': move.from_sq, 'to_sq': move.to_sq, 'flag': move.flag} for move in game.legal_moves],
         'status' : game.current_status.value,
+        'side' : game.board.side,
     }
     
     return JsonResponse(data)
@@ -45,10 +48,14 @@ def make_move(request):
     move_history.append({'from_sq': matched_move.from_sq, 'to_sq': matched_move.to_sq, 'flag': matched_move.flag, 'captured': matched_move.captured})
     request.session['move_history'] = move_history
     
+    captures = [move["captured"] for move in move_history if move["captured"] != EMPTY]
+    
     outgoing_data = {
         'board' : game.board.squares,
         'legal_moves' : [{'from_sq': move.from_sq, 'to_sq': move.to_sq, 'flag': move.flag} for move in game.legal_moves],
         'status' : game.current_status.value,
+        'side' : game.board.side,
+        'captures' : captures,
     }
     
     return JsonResponse(outgoing_data)
