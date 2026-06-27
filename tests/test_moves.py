@@ -1,4 +1,4 @@
-import pytest  # type: ignore[import]
+import pytest
 from engine.fen import board_from_fen
 from engine.move_generator import MoveGenerator
 from engine.constants import *

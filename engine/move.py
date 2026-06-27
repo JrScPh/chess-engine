@@ -6,6 +6,9 @@ class Move:
         self.to_sq = to_sq
         self.flag = flag
         self.captured = captured
+        
+    def __eq__(self, other):
+        return self.from_sq == other.from_sq and self.to_sq == other.to_sq and self.flag == other.flag
 
     @property
     def is_capture(self):
