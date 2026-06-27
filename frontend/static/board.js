@@ -69,6 +69,31 @@ function updateStatusMessage() {
         subtitle.textContent = 'By fifty-move rule';
     }
 }
+function updateCaptures() {
+    const whitePieces = data.captures.filter(piece => piece > 0);
+    const blackPieces = data.captures.filter(piece => piece < 0);
+
+    whitePieces.sort((a, b) => a - b);
+    blackPieces.sort((a, b) => b - a);
+
+    const capturedBlack = document.getElementById("captured-black");
+    const capturedWhite = document.getElementById("captured-white");
+
+    capturedBlack.innerHTML = '';
+    capturedWhite.innerHTML = '';
+
+    for (const piece of blackPieces) {
+        const span = document.createElement('span');
+        span.textContent = pieceSymbols[piece];
+        capturedBlack.appendChild(span);
+    }
+
+    for (const piece of whitePieces) {
+        const span = document.createElement('span');
+        span.textContent = pieceSymbols[piece];
+        capturedWhite.appendChild(span);
+    }
+}
 async function startGame() {
     const response = await fetch('/api/start-game/');
     data = await response.json();
@@ -116,6 +141,7 @@ async function makeMove(move) {
     data = await response.json();
     clearHighlights();
     setBoard();
+    updateCaptures();
     updateStatusMessage();
 }
 

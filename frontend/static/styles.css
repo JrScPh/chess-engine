@@ -57,3 +57,15 @@ header {
     font-size: 4vmin;
     cursor: pointer;
 }
+
+#game-area {
+    display: flex;
+}
+
+.captured {
+    font-size: 4vmin;
+    width: 10vmin;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

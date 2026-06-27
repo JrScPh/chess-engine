@@ -16,12 +16,16 @@
     <h1 id="status-title"></h1>
     <p id="status-subtitle"></p>
     </header>
-    <div id="board"></div>
-        <div id="promotion-dialog" class="hidden">
-        <button id="promo-queen">♕</button>
-        <button id="promo-rook">♖</button>
-        <button id="promo-bishop">♗</button>
-        <button id="promo-knight">♘</button>
+    <div id="game-area">
+        <div id="captured-black"  class="captured"></div>
+        <div id="board"></div>
+            <div id="promotion-dialog" class="hidden">
+            <button id="promo-queen">♕</button>
+            <button id="promo-rook">♖</button>
+            <button id="promo-bishop">♗</button>
+            <button id="promo-knight">♘</button>
+        </div>
+        <div id="captured-white" class="captured"></div>
     </div>
     <script src="{% static 'board.js' %}"></script>
 
