@@ -2,8 +2,6 @@
 
 A chess engine built from scratch in Python, with a Django backend and a vanilla JS/HTML/CSS frontend. Move generation, rules enforcement, and game state are handled entirely server-side; the frontend is a thin rendering layer with no game logic of its own.
 
-This is the Python implementation in a planned multi-language chess project (Java, C, C++ versions to follow as separate repos).
-
 ## Features
 
 - Full move generation from scratch (no chess libraries) — all piece types, castling, en passant, promotion (including underpromotion)
