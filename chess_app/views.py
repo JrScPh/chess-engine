@@ -1,11 +1,15 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.shortcuts import render
 from engine.game import Game
 from engine.move import Move
 import json
 
 def move_from_dict(move):
     return Move(move['from_sq'], move['to_sq'], move['flag'], move['captured'])
+
+def index(request):
+    return render(request, 'index.html')
 
 def start_game(request):
     game = Game()
