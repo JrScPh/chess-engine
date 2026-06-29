@@ -4,10 +4,14 @@ const pieceSymbols = {
     1: '♙', 2: '♘', 3: '♗', 4: '♖', 5: '♕', 6: '♔',
     '-1': '♟', '-2': '♞', '-3': '♝', '-4': '♜', '-5': '♛', '-6': '♚',
 };
+const difficultyButtons = ['easy', 'medium', 'hard'];
+const sideButtons = ['white', 'random', 'black'];
 let currentMoves = []
 let data = null;
 let pendingFromSq = null;
 let pendingToSq = null;
+let difficulty = null;
+let playerSide = null;
 
 function fileOf(index) {
     return index % 8;
@@ -94,6 +98,7 @@ function updateCaptures() {
         capturedWhite.appendChild(span);
     }
 }
+
 async function startGame() {
     const response = await fetch('/api/start-game/');
     data = await response.json();
@@ -125,6 +130,18 @@ function handlePromotion(flag) {
     makeMove({ from_sq: pendingFromSq, to_sq: pendingToSq, flag: flag });
     promotionDialog.classList.add('hidden');
 }
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+function selectOption(selectedId, groupIds) {
+    for (const id of groupIds) {
+        document.getElementById(id).classList.remove('selected');
+    }
+    document.getElementById(selectedId).classList.add('selected');
+
+    document.getElementById('confirm').disabled = !(difficulty && playerSide);
+}
+
 async function makeMove(move) {
     const response = await fetch('/api/make-move/', {
         method: 'POST',
@@ -143,6 +160,33 @@ async function makeMove(move) {
     setBoard();
     updateCaptures();
     updateStatusMessage();
+    if (difficulty === "easy") {
+        makeBotMoveEasy()
+    }
+    if (difficulty === "medium") {
+        //makeBotMoveMedium()
+    }
+    if (difficulty === "hard") {
+        //makeBotMoveHard()
+    }
+
+}
+
+async function makeBotMoveEasy() {
+    const response = await fetch('/api/bot-move-easy/');
+    data = await response.json();
+
+    if (!response.ok) {
+        console.error(data.error);
+        return;
+    }
+
+    const delay = 1000 + Math.random() * 1000;
+    await sleep(delay);
+
+    setBoard();
+    updateStatusMessage();
+    updateCaptures();
 }
 
 for (let i = 7; i >= 0; i--) {
@@ -159,9 +203,60 @@ for (let i = 7; i >= 0; i--) {
         boardContainer.appendChild(square);
     }
 }
+
 document.getElementById('promo-queen').addEventListener('click', () => handlePromotion(6));
 document.getElementById('promo-rook').addEventListener('click', () => handlePromotion(7));
 document.getElementById('promo-bishop').addEventListener('click', () => handlePromotion(8));
 document.getElementById('promo-knight').addEventListener('click', () => handlePromotion(9));
 
-startGame();
+document.getElementById('easy').addEventListener('click', () => {
+    difficulty = 'easy';
+    selectOption('easy', difficultyButtons);
+});
+document.getElementById('medium').addEventListener('click', () => {
+    difficulty = 'medium';
+    selectOption('medium', difficultyButtons);
+});
+document.getElementById('hard').addEventListener('click', () => {
+    difficulty = 'hard';
+    selectOption('hard', difficultyButtons);
+});
+
+document.getElementById('white').addEventListener('click', () => {
+    playerSide = 'white';
+    selectOption('white', sideButtons);
+});
+document.getElementById('random').addEventListener('click', () => {
+    playerSide = 'random';
+    selectOption('random', sideButtons);
+});
+document.getElementById('black').addEventListener('click', () => {
+    playerSide = 'black';
+    selectOption('black', sideButtons);
+});
+document.getElementById('confirm').disabled = true;
+
+document.getElementById('confirm').addEventListener('click', async () => {
+    document.getElementById('game-setup').style.display = 'none';
+    if (playerSide === 'random') {
+        temp = Math.random()
+        playerSide = temp < 0.5 ? 'white' : 'black';
+    }
+
+    await startGame();
+
+    if (playerSide === 'black') {
+        document.getElementById('board').classList.add('flipped');
+        if (difficulty === 'easy') {
+            await makeBotMoveEasy();
+        }
+        if (difficulty === 'medium') {
+            //makeBotMoveMedium()
+        }
+        if (difficulty === 'hard') {
+            //makeBotMoveHard()
+        }
+    }
+
+
+});
