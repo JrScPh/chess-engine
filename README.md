@@ -52,7 +52,7 @@ chess-engine/
 ```bash
 git clone https://github.com/<your-username>/chess-engine.git
 cd chess-engine
-pip install django
+pip install django pytest
 python manage.py migrate
 python manage.py runserver
 ```
