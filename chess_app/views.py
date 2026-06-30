@@ -4,11 +4,10 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from engine.game import Game
 from engine.move import Move
 from engine.constants import EMPTY
+from engine.bot import choose_bot_move
 import json
 import random
-from engine.constants import EMPTY, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, GameStatus
-
-PIECE_VALUES = {PAWN: 1, KNIGHT: 3, BISHOP: 3, ROOK: 5, QUEEN: 9}
+from engine.constants import EMPTY, GameStatus
 
 def move_from_dict(move):
     return Move(move['from_sq'], move['to_sq'], move['flag'], move['captured'])
@@ -72,7 +71,7 @@ def make_move(request):
 
     return _finalize_and_respond(request, game, move_history, matched_move)
 
-def make_bot_move_easy(request):
+def make_bot_move(request):
     game, move_history = _reconstruct_game(request)
     if game is None:
         return JsonResponse({'error': 'No active game'}, status=400)
@@ -80,26 +79,5 @@ def make_bot_move_easy(request):
     if game.current_status != GameStatus.ONGOING:
         return JsonResponse({'error': 'Game has ended'}, status=400)
 
-    move = choose_easy_bot_move(game)
+    move = choose_bot_move(game)
     return _finalize_and_respond(request, game, move_history, move)
-
-def choose_easy_bot_move(game):
-    # 1. Take mate-in-1 if available
-    for move in game.legal_moves:
-        game.push(move)
-        is_mate = game.current_status == GameStatus.CHECKMATE
-        game.pop()
-        if is_mate:
-            return move
-
-    # 2. Shuffle captures, roll each one's odds in turn
-    captures = [move for move in game.legal_moves if move.captured != EMPTY]
-    random.shuffle(captures)
-    for move in captures:
-        piece_value = PIECE_VALUES[abs(move.captured)]
-        if random.random() < piece_value / 10:
-            return move
-
-    # 3. Otherwise, pick uniformly at random
-    return random.choice(game.legal_moves)
-

@@ -4,8 +4,7 @@ const pieceSymbols = {
     1: '♙', 2: '♘', 3: '♗', 4: '♖', 5: '♕', 6: '♔',
     '-1': '♟', '-2': '♞', '-3': '♝', '-4': '♜', '-5': '♛', '-6': '♚',
 };
-const difficultyButtons = ['easy', 'medium', 'hard'];
-const sideButtons = ['white', 'random', 'black'];
+const groupIds = ['white', 'random', 'black'];
 let currentMoves = []
 let data = null;
 let pendingFromSq = null;
@@ -47,7 +46,6 @@ function updateStatusMessage() {
     const subtitle = document.getElementById('status-subtitle');
     const winner = data.side === 1 ? 'Black' : 'White';
     const currentSide = data.side === 1 ? 'White' : 'Black';
-    console.log(data.side, data.status)
     if (data.status === 'ongoing') {
         title.textContent = 'Ongoing';
         subtitle.textContent = `${currentSide} to play`;
@@ -133,13 +131,13 @@ function handlePromotion(flag) {
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-function selectOption(selectedId, groupIds) {
+function selectOption(selectedId) {
     for (const id of groupIds) {
         document.getElementById(id).classList.remove('selected');
     }
     document.getElementById(selectedId).classList.add('selected');
 
-    document.getElementById('confirm').disabled = !(difficulty && playerSide);
+    document.getElementById('confirm').disabled = !playerSide;
 }
 
 async function makeMove(move) {
@@ -160,29 +158,18 @@ async function makeMove(move) {
     setBoard();
     updateCaptures();
     updateStatusMessage();
-    if (difficulty === "easy") {
-        makeBotMoveEasy()
-    }
-    if (difficulty === "medium") {
-        //makeBotMoveMedium()
-    }
-    if (difficulty === "hard") {
-        //makeBotMoveHard()
-    }
+    makeBotMove();
 
 }
 
-async function makeBotMoveEasy() {
-    const response = await fetch('/api/bot-move-easy/');
+async function makeBotMove() {
+    const response = await fetch('/api/bot-move/');
     data = await response.json();
 
     if (!response.ok) {
         console.error(data.error);
         return;
     }
-
-    const delay = 1000 + Math.random() * 1000;
-    await sleep(delay);
 
     setBoard();
     updateStatusMessage();
@@ -209,30 +196,17 @@ document.getElementById('promo-rook').addEventListener('click', () => handleProm
 document.getElementById('promo-bishop').addEventListener('click', () => handlePromotion(8));
 document.getElementById('promo-knight').addEventListener('click', () => handlePromotion(9));
 
-document.getElementById('easy').addEventListener('click', () => {
-    difficulty = 'easy';
-    selectOption('easy', difficultyButtons);
-});
-document.getElementById('medium').addEventListener('click', () => {
-    difficulty = 'medium';
-    selectOption('medium', difficultyButtons);
-});
-document.getElementById('hard').addEventListener('click', () => {
-    difficulty = 'hard';
-    selectOption('hard', difficultyButtons);
-});
-
 document.getElementById('white').addEventListener('click', () => {
     playerSide = 'white';
-    selectOption('white', sideButtons);
+    selectOption('white');
 });
 document.getElementById('random').addEventListener('click', () => {
     playerSide = 'random';
-    selectOption('random', sideButtons);
+    selectOption('random');
 });
 document.getElementById('black').addEventListener('click', () => {
     playerSide = 'black';
-    selectOption('black', sideButtons);
+    selectOption('black');
 });
 document.getElementById('confirm').disabled = true;
 
@@ -247,16 +221,7 @@ document.getElementById('confirm').addEventListener('click', async () => {
 
     if (playerSide === 'black') {
         document.getElementById('board').classList.add('flipped');
-        if (difficulty === 'easy') {
-            await makeBotMoveEasy();
-        }
-        if (difficulty === 'medium') {
-            //makeBotMoveMedium()
-        }
-        if (difficulty === 'hard') {
-            //makeBotMoveHard()
-        }
+        await makeBotMove();
     }
-
 
 });
